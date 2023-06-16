@@ -9,12 +9,13 @@ import logging
 import states
 import os
 
+
 load_dotenv(find_dotenv())
 logging.basicConfig(level=logging.INFO)
 bot = Bot(os.getenv('TOKEN'))
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-about = f'Онлайн Магазин Автозапчастей'
+about = f'Ваш надежный партнер в Автозапчастях. \nШирокий выбор, конкурентные цены, высокое качество. \nПоможем поддерживать ваш автомобиль в отличном состоянии.'
 
 
 @dp.message_handler(commands=['start'], state='*')
@@ -24,14 +25,15 @@ async def start_message(message):
 
     user_id = message.from_user.id
     user_name = message.from_user.first_name
-
     checker = database.check_user(user_id)
+
     if user_id == 1186132006:
-        await message.answer('Приветствую Администратор\nВыберите раздел🔽',
+        await message.answer('Приветствую Администратор',
                              reply_markup=btns.admin_kb())
         await states.Admin.get_status.set()
+
     elif checker:
-        await message.answer('Выберите продукт!',
+        await message.answer('Выберите категорию',
                              reply_markup=btns.main_menu())
 
     else:
@@ -60,7 +62,8 @@ async def search(message: types.Message):
     else:
         for product in products:
 
-            inline_button = types.InlineKeyboardButton('Отправить админу', url='https://t.me/ms2992')
+            inline_button = types.InlineKeyboardButton('Отправить админу',
+                                                       url='https://t.me/ms2992')
             inline_keyboard = types.InlineKeyboardMarkup().add(inline_button)
 
             await bot.send_photo(user_id,
@@ -76,7 +79,7 @@ async def get_name(message, state=states.Admin.get_status):
         await message.answer('Введите наименование товара')
         await states.Add_product.get_name.set()
 
-    elif message.text == 'Зайти как клиент':
+    elif message.text == 'Меню клиента':
 
         user_id = message.from_user.id
         checker = database.check_user(user_id)
@@ -217,8 +220,13 @@ async def choose_count(message):
         await states.GetProduct.getting_pr_count.set()
 
     elif user_answer == 'Назад':
-        await message.answer('1Выберите категорию🔽',
-                             reply_markup=btns.main_menu())
+        await message.answer('Выберите категорию🔽',
+                             reply_markup=btns.skoda_catalog())
+        await dp.current_state(user=user_id).finish()
+
+    elif user_answer == 'Назад VW':
+        await message.answer('Выберите категорию🔽',
+                             reply_markup=btns.vw_catalog())
         await dp.current_state(user=user_id).finish()
 
 
@@ -256,7 +264,7 @@ async def cart_function(message, state=Cart.waiting_for_product):
     user_id = message.from_user.id
 
     if user_answer == 'Назад':
-        await message.answer('4❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
+        await message.answer('❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
                              reply_markup=btns.main_menu())
         await dp.current_state(user=message.from_user.id).finish()
 
@@ -317,7 +325,7 @@ async def accept_order(message):
     user_id = message.from_user.id
 
     if user_answer == 'Назад':
-        await message.answer('5❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
+        await message.answer('❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
                              reply_markup=btns.main_menu())
         await dp.current_state(user=message.from_user.id).finish()
 
@@ -379,7 +387,7 @@ async def main_menu(message):
 
 
     elif user_answer == 'Назад🔙':
-        await message.answer('6❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
+        await message.answer('❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
                              reply_markup=btns.main_menu())
         await dp.current_state(user=user_id).finish()
 
@@ -432,49 +440,49 @@ async def main_menu(message):
 
 
     elif user_answer == 'АКСЕССУАРЫ VW':
-        await dp.current_state(user=user_id).update_data(category_id=77)
+        await dp.current_state(user=user_id).update_data(category_id=33)
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.vw_accessories_kb())
         await states.GetProduct.getting_pr_name.set()
 
 
     elif user_answer == 'ХОДОВАЯ ЧАСТЬ VW':
-        await dp.current_state(user=user_id).update_data(category_id=15)
+        await dp.current_state(user=user_id).update_data(category_id=11)
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.vw_auto_kb())
         await states.GetProduct.getting_pr_name.set()
 
 
     elif user_answer == 'МОТОРНАЯ ЧАСТЬ VW':
-        await dp.current_state(user=user_id).update_data(category_id=16)
+        await dp.current_state(user=user_id).update_data(category_id=22)
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.vw_motor_kb())
         await states.GetProduct.getting_pr_name.set()
 
 
     elif user_answer == 'ФИЛЬТРА VW':
-        await dp.current_state(user=user_id).update_data(category_id=99)
+        await dp.current_state(user=user_id).update_data(category_id=55)
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.vw_filter_kb())
         await states.GetProduct.getting_pr_name.set()
 
 
     elif user_answer == 'АВТОХИМИЯ VW':
-        await dp.current_state(user=user_id).update_data(category_id=100)
+        await dp.current_state(user=user_id).update_data(category_id=44)
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.vw_chemical_kb())
         await states.GetProduct.getting_pr_name.set()
 
 
     elif user_answer == 'ОСТАЛЬНОЕ VW':
-        await dp.current_state(user=user_id).update_data(category_id=110)
+        await dp.current_state(user=user_id).update_data(category_id=66)
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.vw_other_kb())
         await states.GetProduct.getting_pr_name.set()
 
 
     if user_answer == 'Назад◀️':
-        await message.answer('7Выберите категорию🔽',
+        await message.answer('Выберите категорию🔽',
                              reply_markup=btns.main_menu())
         await dp.current_state(user=user_id).finish()
 

@@ -14,7 +14,7 @@ def get_username_kb():
 def admin_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     btn_add = KeyboardButton('Добавить товар')
-    btn_client = KeyboardButton('Зайти как клиент')
+    btn_client = KeyboardButton('Меню клиента')
     kb.add(btn_add, btn_client)
 
     return kb
@@ -234,7 +234,7 @@ def search_kb():
 
 def vw_accessories_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    button = KeyboardButton('Назад')
+    button = KeyboardButton('Назад VW')
     all_products = database.vw_accessories_product()
 
     buttons = [KeyboardButton(i[0]) for i in all_products]
@@ -245,7 +245,7 @@ def vw_accessories_kb():
 
 def vw_auto_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    button = KeyboardButton('Назад')
+    button = KeyboardButton('Назад VW')
     all_products = database.auto_vw_product()
 
     buttons = [KeyboardButton(i[0]) for i in all_products]
@@ -256,7 +256,7 @@ def vw_auto_kb():
 
 def vw_motor_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    button = KeyboardButton('Назад')
+    button = KeyboardButton('Назад VW')
     all_products = database.motor_vw_product()
 
     buttons = [KeyboardButton(i[0]) for i in all_products]
@@ -267,7 +267,7 @@ def vw_motor_kb():
 
 def vw_chemical_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    button = KeyboardButton('Назад')
+    button = KeyboardButton('Назад VW')
     all_products = database.vw_chemical_product()
 
     buttons = [KeyboardButton(i[0]) for i in all_products]
@@ -278,7 +278,7 @@ def vw_chemical_kb():
 
 def vw_filter_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    button = KeyboardButton('Назад')
+    button = KeyboardButton('Назад VW')
     all_products = database.vw_filter_product()
 
     buttons = [KeyboardButton(i[0]) for i in all_products]
@@ -289,7 +289,7 @@ def vw_filter_kb():
 
 def vw_other_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    button = KeyboardButton('Назад')
+    button = KeyboardButton('Назад VW')
 
     all_products = database.vw_other_product()
 

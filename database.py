@@ -131,6 +131,7 @@ def get_name_product(category_id):
     product_id = sql.execute('SELECT * FROM products WHERE id=?;', (category_id,))
     return product_id.fetchall()
 
+
 def auto_skoda_product():
 
     connection = sqlite3.connect('base.db')
@@ -138,6 +139,7 @@ def auto_skoda_product():
 
     product_id = sql.execute('SELECT * FROM products WHERE id=15;')
     return product_id.fetchall()
+
 
 def motor_skoda_product():
 
@@ -147,6 +149,7 @@ def motor_skoda_product():
     product_id = sql.execute('SELECT * FROM products WHERE id=16;')
     return product_id.fetchall()
 
+
 def accessories_product():
 
     connection = sqlite3.connect('base.db')
@@ -154,6 +157,7 @@ def accessories_product():
 
     product_id = sql.execute('SELECT * FROM products WHERE id=22;')
     return product_id.fetchall()
+
 
 def chemical_product():
 
@@ -201,6 +205,7 @@ def auto_vw_product():
     product_id = sql.execute('SELECT * FROM vw WHERE id=11;')
     return product_id.fetchall()
 
+
 def motor_vw_product():
 
     connection = sqlite3.connect('base.db')
@@ -209,6 +214,7 @@ def motor_vw_product():
     product_id = sql.execute('SELECT * FROM vw WHERE id=22;')
     return product_id.fetchall()
 
+
 def vw_accessories_product():
 
     connection = sqlite3.connect('base.db')
@@ -216,6 +222,7 @@ def vw_accessories_product():
 
     product_id = sql.execute('SELECT * FROM vw WHERE id=33;')
     return product_id.fetchall()
+
 
 def vw_chemical_product():
 
@@ -244,31 +251,9 @@ def vw_other_product():
     return product_id.fetchall()
 
 
-#Запрос для удаления из базы данных
-# def delete_user():
-#     # Создать/подключитсья к базе данных
-#     connection = sqlite3.connect('base.db')
-#     # Создаем переводчика
-#     sql = connection.cursor()
-#
-#     #Отправляем запрос на удаления
-#     sql.execute('DELETE FROM users;')
-#
-# delete_user()
-
 # Запрос на создание таблицы
 
 # sql.execute('CREATE TABLE users (id INTEGER, name INTEGER, phone_number TEXT, loc_lat REAL, loc_long REAL, gender TEXT);')
 # sql.execute('CREATE TABLE vw (name INTEGER, id INTEGER, price INTEGER, description TEXT, picture TEXT, notes TEXT);')
 # sql.execute('CREATE TABLE cart (user_id INTEGER, product_name TEXT, user_number TEXT, product_price INTEGER, product_count INTEGER);')
 
-
-# sql.execute('CREATE TABLE cart(id INTEGER, product_name INTEGER, product_count INTEGER);')
-# sql.execute('CREATE TABLE products(id INTEGER, product_name TEXT, product_price REAL, product_info TEXT, product_photo TEXT);')
-# sql.execute('CREATE TABLE users (id INTEGER, name INTEGER, phone_number TEXT, loc_lat REAL, loc_long REAL, gender TEXT);')
-
-# sql.execute('CREATE TABLE cart(id INTEGER, '
-#             'product_name INTEGER, '
-#             'product_count INTEGER);')
-
-# sql.execute('CREATE TABLE products(id INTEGER, pr_id INTEGER, product_name TEXT, product_price INTEGER, product_info TEXT, product_photo TEXT);')
