@@ -7,8 +7,8 @@ import buttons as btns
 import database
 import logging
 import states
+import csv
 import os
-
 
 load_dotenv(find_dotenv())
 logging.basicConfig(level=logging.INFO)
@@ -44,9 +44,85 @@ async def start_message(message):
         await states.Registration.getting_name_state.set()
 
 
+# @dp.message_handler(commands=['show_users'])
+# async def show_users(message: types.Message):
+#     users = database.get_users()
+#
+#
+#     if users:
+#         response = "Список пользователей:\n"
+#         for user in users:
+#             response += f"ID: {user[1]}, Username: {user[0]}\n"
+#     else:
+#         response = "Список пользователей пуст."
+#
+#
+#     await message.answer(response)
+
+
+@dp.message_handler(commands=['show_users'])
+async def show_users(message: types.Message):
+    admin_id = 1186132006
+
+    if message.from_user.id != admin_id:
+        response = "Команда доступна только администратору."
+        await message.answer(response)
+        return
+
+    users = database.get_users()
+
+    if users:
+
+        with open('users.csv', 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["ID", "Username"])
+
+            for user in users:
+                writer.writerow([user[0], user[1]])
+
+        with open('users.csv', 'rb') as file:
+            await message.bot.send_document(admin_id, file)
+
+        response = "Список пользователей сохранен в файле users.csv и отправлен администратору."
+    else:
+        response = "Список пользователей пуст."
+
+    await message.answer(response)
+
+
+# import codecs
+#
+# @dp.message_handler(commands=['show_users'])
+# async def show_users(message: types.Message):
+#     admin_id = 1186132006
+#
+#     if message.from_user.id != admin_id:
+#         response = "Команда доступна только администратору."
+#         await message.answer(response)
+#         return
+#
+#     users = database.get_users()
+#
+#     if users:
+#         with codecs.open('users.csv', 'w', newline='', encoding='utf-8') as file:
+#             writer = csv.writer(file)
+#             writer.writerow(["ID", "Username", "Number"])
+#
+#             for user in users:
+#                 writer.writerow([user[0], user[1], user[2]])
+#
+#         with open('users.csv', 'rb') as file:
+#             await message.bot.send_document(admin_id, file)
+#
+#         response = "Список пользователей сохранен в файле users.csv и отправлен администратору."
+#     else:
+#         response = "Список пользователей пуст."
+#
+#     await message.answer(response)
+
+
 @dp.message_handler(commands=['search'])
 async def search(message: types.Message):
-
     user_id = message.from_user.id
     args = message.get_args()
 
@@ -60,17 +136,16 @@ async def search(message: types.Message):
         await message.reply('Товары не найдены.')
 
     else:
-        for product in products:
 
-            inline_button = types.InlineKeyboardButton('Отправить админу',
-                                                       url='https://t.me/ms2992')
-            inline_keyboard = types.InlineKeyboardMarkup().add(inline_button)
+        for product in products:
+            await dp.current_state(user=user_id).update_data(pr_name=product[0], pr_count=1, price=product[2])
 
             await bot.send_photo(user_id,
                                  photo=product[4],
                                  caption=f'{product[0]}\n\nЦена: {product[2]} $\n\nОписание:\n {product[3]}',
-                                 reply_markup=inline_keyboard)
+                                 reply_markup=btns.choose_product_count())
 
+        await states.GetProduct.getting_pr_count.set()
 
 @dp.message_handler(state=states.Admin.get_status)
 async def get_name(message, state=states.Admin.get_status):
@@ -211,9 +286,17 @@ async def choose_count(message):
     if user_answer in actual_products:
 
         product_info = database.get_all_info_product(user_answer)
+        # Сохраним продукт во временный словарь
+        # call.data - значение нажатой кнопки(инлайн)
+        await dp.current_state(user=user_id).update_data(pr_name=user_answer, pr_count=1, price=product_info[2])
+
+        # await bot.send_photo(user_id, photo=product_info[4],
+        #                      caption=f'{product_info[0]}\n\nЦена: {product_info[2]} $\n\nОписание:\n {product_info[3]}\n\nВыберите количество1️⃣2️⃣3️⃣',
+        #                      reply_markup=btns.product_count())
+
         await bot.send_photo(user_id, photo=product_info[4],
                              caption=f'{product_info[0]}\n\nЦена: {product_info[2]} $\n\nОписание:\n {product_info[3]}\n\nВыберите количество1️⃣2️⃣3️⃣',
-                             reply_markup=btns.product_count())
+                             reply_markup=btns.choose_product_count())
 
         await dp.current_state(user=user_id).update_data(user_product=message.text, price=product_info[2])
 
@@ -230,32 +313,30 @@ async def choose_count(message):
         await dp.current_state(user=user_id).finish()
 
 
-@dp.message_handler(state=GetProduct.getting_pr_count)
-async def text_message3(message, state=GetProduct.getting_pr_count):
-    product_count = message.text
-    user_data = await state.get_data()
-    user_product = user_data.get('user_product')
-    category_id = user_data.get('category_id')
-    pr_price = float(user_data.get('price'))
-    user_id = message.from_user.id
-
-    if product_count.isnumeric():
-        database.add_pr_to_cart(message.from_user.id, user_product, pr_price, int(product_count))
-        database.add_pr_to_cart2(message.from_user.id, user_product, pr_price, int(product_count))
-
-        await message.answer('Товар добавлен в корзину✅\n\nВыберите продукт🔽',
-                             reply_markup=btns.main_menu())
-        await state.finish()
-
-    # elif message.text == 'Назад':
-    #     await message.answer('2Выберите количество используя кнопки🔽',
-    #                          reply_markup=btns.count_kb(category_id))
-    #     await dp.current_state(user=user_id).finish()
-
-    else:
-        await message.answer('Выберите товар из списка🔽',
-                             reply_markup=btns.count_kb(category_id))
-        await states.GetProduct.getting_pr_name.set()
+# @dp.message_handler(state=GetProduct.getting_pr_count)
+# async def text_message3(message, state=GetProduct.getting_pr_count):
+#     product_count = message.text
+#     user_data = await state.get_data()
+#     user_product = user_data.get('user_product')
+#     category_id = user_data.get('category_id')
+#     pr_price = float(user_data.get('price'))
+#     user_id = message.from_user.id
+#
+#     if product_count.isnumeric():
+#         database.add_pr_to_cart(message.from_user.id, user_product, pr_price, int(product_count))
+#         database.add_pr_to_cart2(message.from_user.id, user_product, pr_price, int(product_count))
+#
+#         await message.answer('Товар добавлен в корзину✅\n\nВыберите продукт🔽',
+#                              reply_markup=btns.main_menu())
+#         await state.finish()
+#
+#     # elif message.text != 'Главное меню':
+#     #     await message.answer('Тест', reply_markup=btns.main_menu())
+#
+#     else:
+#         await message.answer('Нажмите еще раз кнопку Назад🔽',
+#                              reply_markup=btns.product_name_kb(category_id))
+#         await states.GetProduct.getting_pr_name.set()
 
 
 @dp.message_handler(state=Cart.waiting_for_product)
@@ -269,7 +350,7 @@ async def cart_function(message, state=Cart.waiting_for_product):
         await dp.current_state(user=message.from_user.id).finish()
 
 
-    elif user_answer == 'Очистить🆑':
+    elif user_answer == '🆑Очистить':
 
         database.delete_from_cart(user_id)
         await message.answer('Корзина очищена✅\n\n❗️❗️Нажмите кнопку Назад❗️❗️')
@@ -315,7 +396,7 @@ async def cart_function(message, state=Cart.waiting_for_product):
             await message.answer(result_answer, reply_markup=btns.main_menu())
             await message.answer('Успешно оформлен✅\n\n')
             await state.finish()
-            await bot.send_message(5928000362, admin_message)
+            await bot.send_message(admin_message)
             database.delete_from_cart(user_id)
 
 
@@ -361,7 +442,7 @@ async def main_menu(message):
     user_answer = message.text
     user_id = message.from_user.id
 
-    if user_answer == 'Корзина🗑':
+    if user_answer == '🛒Корзина':
         user_cart = database.get_user_cart(message.from_user.id)
 
         if user_cart:
@@ -380,13 +461,12 @@ async def main_menu(message):
         else:
             await message.answer('Ваша корзина пустая🗑')
 
-
     if user_answer == 'SKODA':
         await message.answer('Выберите категорию🔽',
                              reply_markup=btns.skoda_catalog())
 
 
-    elif user_answer == 'Назад🔙':
+    elif user_answer == '🔙Назад':
         await message.answer('❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
                              reply_markup=btns.main_menu())
         await dp.current_state(user=user_id).finish()
@@ -432,7 +512,6 @@ async def main_menu(message):
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.other_kb())
         await states.GetProduct.getting_pr_name.set()
-
 
     if user_answer == 'VOLKSWAGEN':
         await message.answer('Выберите категорию🔽',
@@ -480,9 +559,8 @@ async def main_menu(message):
                              reply_markup=btns.vw_other_kb())
         await states.GetProduct.getting_pr_name.set()
 
-
-    if user_answer == 'Назад◀️':
-        await message.answer('Выберите категорию🔽',
+    if user_answer == '◀️Назад':
+        await message.answer('❗️Вы вернулись в Главное меню❗️\n\nВыберите раздел🔽',
                              reply_markup=btns.main_menu())
         await dp.current_state(user=user_id).finish()
 
@@ -491,12 +569,12 @@ async def main_menu(message):
         await message.answer(about)
 
 
-    elif user_answer == 'Контакты☎️':
+    elif user_answer == '☎️Контакты':
         await message.answer(f'📞 Телефон:\n+998990952992\n+998990902992 \n\nTelegram: @ms2992'
                              f'\n\n🚚 Доставка по городу: Бесплатно')
 
 
-    elif user_answer == 'Список заказов📄':
+    elif user_answer == '📄Список заказов':
 
         user_cart = database.get_user_cart(message.from_user.id)
 
@@ -519,9 +597,76 @@ async def main_menu(message):
 
             await Order.waiting_accept.set()
 
+
         else:
             await message.answer('Ваша корзина пустая🗑\n\n'
                                  'Для выбора продукта нажмите одну из кнопок ниже')
+
+
+# Обработчик выбора количества
+@dp.callback_query_handler(lambda call: call.data in ['increment', 'decrement', 'to_cart', 'back'],
+                           state=states.GetProduct.getting_pr_count)
+async def get_user_product_count(call):
+    # Сохраним айди пользователя
+    user_id = call.message.chat.id
+
+    # Если пользователь нажал на +
+    if call.data == 'increment':
+        user_data = await dp.current_state(user=user_id).get_data()
+        actual_count = user_data['pr_count']
+
+        # Обновим значение количества
+        await dp.current_state(user=user_id).update_data(pr_count=user_data['pr_count'] + 1)
+
+        # Меняем значение кнопки
+        await bot.edit_message_reply_markup(chat_id=user_id,
+                                            message_id=call.message.message_id,
+                                            reply_markup=btns.choose_product_count('increment', actual_count))
+
+    # decrement
+    # Если пользователь нажал на -
+    elif call.data == 'decrement':
+        user_data = await dp.current_state(user=user_id).get_data()
+        actual_count = user_data['pr_count']
+
+        # Обновим значение количества
+        await dp.current_state(user=user_id).update_data(pr_count=user_data['pr_count'] - 1)
+
+        # Меняем значение кнопки
+        await bot.edit_message_reply_markup(chat_id=user_id,
+                                            message_id=call.message.message_id,
+                                            reply_markup=btns.choose_product_count('decrement', actual_count))
+
+    # back
+    # Если пользователь нажал 'назад'
+    elif call.data == 'back':
+        # Получаем меню
+        products = database.get_name_product()
+        # меняем на меню
+        await bot.edit_message_text('Выберите пункт меню',
+                                    user_id,
+                                    call.message.message_id,
+                                    reply_markup=btns.main_menu())
+
+    # Если нажал Добавить в корзину
+    elif call.data == 'to_cart':
+        # Получаем данные
+        user_data = await dp.current_state(user=user_id).get_data()
+        product_count = user_data['pr_count']
+        user_product = user_data['pr_name']
+        price = user_data['price']
+
+        # Добавляем в базу(корзина пользователя)
+        database.add_pr_to_cart(user_id, user_product, price, product_count)
+
+        # Получаем обратно меню
+
+        # меняем на меню
+        await call.message.delete()
+        await call.message.answer('Продукт добавлен в корзину\nЧто-нибудь еще?',
+                                  reply_markup=btns.main_menu())
+
+        await dp.current_state(user=user_id).finish()
 
 
 if __name__ == '__main__':

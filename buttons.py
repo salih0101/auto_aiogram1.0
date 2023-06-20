@@ -15,7 +15,8 @@ def admin_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     btn_add = KeyboardButton('Добавить товар')
     btn_client = KeyboardButton('Меню клиента')
-    kb.add(btn_add, btn_client)
+    btn_client1 = KeyboardButton('/show_users')
+    kb.add(btn_add, btn_client, btn_client1)
 
     return kb
 
@@ -38,8 +39,8 @@ def location_kb():
 
 def gender_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    button = KeyboardButton('Мужчина👨')
-    button1 = KeyboardButton('Женщина👩‍🦰')
+    button = KeyboardButton('👨Мужчина')
+    button1 = KeyboardButton('👩‍🦰Женщина')
     kb.add(button, button1)
 
     return kb
@@ -56,17 +57,13 @@ def product_count():
 
 
 def main_menu():
-    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    skoda = KeyboardButton('SKODA')
-    vw = KeyboardButton('VOLKSWAGEN')
-    order = KeyboardButton('Список заказов📄')
-    cart = KeyboardButton('Корзина🗑')
-    about = KeyboardButton('О нас')
-    callback = KeyboardButton('Контакты☎️')
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add('SKODA', 'VOLKSWAGEN')
+    keyboard.add('📄Список заказов')
+    keyboard.add('🛒Корзина')
+    keyboard.add('Контакты☎️', 'О нас')
 
-    kb.add(skoda, vw, order, cart, callback, about)
-
-    return kb
+    return keyboard
 
 
 def accessories_kb():
@@ -149,10 +146,9 @@ def catalog_kb():
 
 
 def cart_kb():
-
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
-    button = KeyboardButton('Очистить🆑')
-    button1 = KeyboardButton('Оформить заказ✅')
+    button = KeyboardButton('🆑Очистить')
+    button1 = KeyboardButton('✅Оформить заказ')
     back = KeyboardButton('Назад')
     kb.add(button1, button, back)
 
@@ -160,7 +156,6 @@ def cart_kb():
 
 
 def order_kb():
-
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     button1 = KeyboardButton('Оформить заказ')
     back = KeyboardButton('Назад')
@@ -170,7 +165,6 @@ def order_kb():
 
 
 def confirmation_kb():
-
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     button = KeyboardButton('Подтвердить')
     button1 = KeyboardButton('Отменить')
@@ -180,8 +174,7 @@ def confirmation_kb():
     return kb
 
 
-def count_kb(category_id):
-
+def product_name_kb(category_id):
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
     button = KeyboardButton('Назад')
     all_products = database.get_name_product(category_id)
@@ -191,35 +184,23 @@ def count_kb(category_id):
 
 
 def skoda_catalog():
-    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    accessories = KeyboardButton('АКСЕССУАРЫ')
-    xod_ch = KeyboardButton('ХОДОВАЯ ЧАСТЬ')
-    mot_ch1 = KeyboardButton('МОТОРНАЯ ЧАСТЬ')
-    filters = KeyboardButton('ФИЛЬТРА')
-    chemical = KeyboardButton('АВТОХИМИЯ')
-    other = KeyboardButton('ОСТАЛЬНОЕ')
-    cart = KeyboardButton('Корзина🗑')
-    back = KeyboardButton('Назад🔙')
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add('АКСЕССУАРЫ')
+    keyboard.add('ХОДОВАЯ ЧАСТЬ', 'МОТОРНАЯ ЧАСТЬ')
+    keyboard.add('ФИЛЬТРА', 'ОСТАЛЬНОЕ')
+    keyboard.add('🛒Корзина', '🔙Назад')
 
-    kb.add(xod_ch, mot_ch1, accessories, chemical, filters, other, back, cart)
-
-    return kb
+    return keyboard
 
 
 def vw_catalog():
-    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
-    accessories = KeyboardButton('АКСЕССУАРЫ VW')
-    xod_ch = KeyboardButton('ХОДОВАЯ ЧАСТЬ VW')
-    mot_ch1 = KeyboardButton('МОТОРНАЯ ЧАСТЬ VW')
-    filters = KeyboardButton('ФИЛЬТРА VW')
-    chemical = KeyboardButton('АВТОХИМИЯ VW')
-    other = KeyboardButton('ОСТАЛЬНОЕ VW')
-    cart = KeyboardButton('Корзина🗑')
-    back = KeyboardButton('Назад◀️')
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
+    keyboard.add('АКСЕССУАРЫ VW')
+    keyboard.add('ХОДОВАЯ ЧАСТЬ VW', 'МОТОРНАЯ ЧАСТЬ VW')
+    keyboard.add('ФИЛЬТРА VW', 'ОСТАЛЬНОЕ VW')
+    keyboard.add('🛒Корзина', '◀️Назад')
 
-    kb.add(accessories, xod_ch, mot_ch1, chemical, filters, other, back, cart)
-
-    return kb
+    return keyboard
 
 
 def search_kb():
@@ -297,4 +278,42 @@ def vw_other_kb():
     kb.add(*buttons, button)
 
     return kb
+
+
+def choose_product_count(plus_or_minus='', current_amount=1):
+    # Создаем пространство для кнопок
+    kb = InlineKeyboardMarkup(row_width=3)
+
+    # Несгораемые кнопки
+    back = InlineKeyboardButton(text='Назад', callback_data='back')
+    plus = InlineKeyboardButton(text='+', callback_data='increment')
+    minus = InlineKeyboardButton(text='-', callback_data='decrement')
+    count = InlineKeyboardButton(text=str(current_amount),
+                                 callback_data=str(current_amount))
+    add_to_cart = InlineKeyboardButton(text='Добавить в корзину',
+                                       callback_data='to_cart')
+
+    # Отслеживаем плюс или минус
+    if plus_or_minus == 'increment':
+        new_amount = int(current_amount) + 1
+
+        count = InlineKeyboardButton(text=str(new_amount),
+                                     callback_data=str(new_amount))
+
+    elif plus_or_minus == 'decrement':
+        if int(current_amount) > 1:
+            new_amount = int(current_amount) - 1
+
+            count = InlineKeyboardButton(text=str(new_amount),
+                                         callback_data=str(new_amount))
+
+    # Обьеденим кнопки с пространством
+    kb.add(minus, count, plus)
+    kb.row(add_to_cart)
+    kb.row(back)
+
+    # Возвращаем кнопки
+    return kb
+
+
 

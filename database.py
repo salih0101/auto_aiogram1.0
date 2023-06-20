@@ -59,6 +59,7 @@ def check_user(user_id):
     else:
         return False
 
+
 def add_pr_to_cart(user_id, product_name, price_pr, product_count):
 
     connection = sqlite3.connect('base.db')
@@ -70,6 +71,7 @@ def add_pr_to_cart(user_id, product_name, price_pr, product_count):
     sql.execute('INSERT INTO cart VALUES (?,?,?,?,?);', (user_id, product_name, user_number, price_pr*product_count, product_count))
 
     connection.commit()
+
 
 def add_pr_to_cart2(user_id, product_name, price_pr, product_count):
 
@@ -83,6 +85,7 @@ def add_pr_to_cart2(user_id, product_name, price_pr, product_count):
 
     connection.commit()
 
+
 def get_all_info_product(current_product):
 
     connection = sqlite3.connect('base.db')
@@ -91,6 +94,7 @@ def get_all_info_product(current_product):
     all_products = sql.execute('SELECT * FROM products WHERE name=?;', (current_product, ))
 
     return all_products.fetchone()
+
 
 def get_user_cart(user_id):
 
