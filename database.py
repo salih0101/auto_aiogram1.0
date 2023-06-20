@@ -38,6 +38,16 @@ def get_products_from_db(current_product):
     products = sql.execute('SELECT * FROM products WHERE name=?;', (current_product, ))
     return products.fetchall()
 
+# def get_users_from_database():
+#
+#     connection = sqlite3.connect('base.db')
+#     sql = connection.cursor()
+#
+#     sql.execute('SELECT id FROM users')
+#     users = sql.fetchall()
+#
+#     return [user[0] for user in users]
+
 
 def get_product_id_from_db():
 
@@ -141,7 +151,7 @@ def auto_skoda_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM products WHERE id=15;')
+    product_id = sql.execute('SELECT * FROM main.products WHERE id=15;')
     return product_id.fetchall()
 
 
@@ -159,7 +169,7 @@ def accessories_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM products WHERE id=22;')
+    product_id = sql.execute('SELECT * FROM products WHERE products.id=22;')
     return product_id.fetchall()
 
 
@@ -168,7 +178,7 @@ def chemical_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM products WHERE id=33;')
+    product_id = sql.execute('SELECT * FROM products WHERE products.id=33;')
     return product_id.fetchall()
 
 
@@ -177,7 +187,7 @@ def filter_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM products WHERE id=44;')
+    product_id = sql.execute('SELECT * FROM products WHERE products.id=44;')
     return product_id.fetchall()
 
 
@@ -186,7 +196,7 @@ def other_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM products WHERE id=55;')
+    product_id = sql.execute('SELECT * FROM products WHERE products.id=55;')
     return product_id.fetchall()
 
 
@@ -195,7 +205,7 @@ def search_product(name):
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    sql.execute("SELECT * FROM products WHERE name LIKE ?", ('%' + name + '%',))
+    sql.execute("SELECT * FROM products WHERE products.name LIKE ?", ('%' + name + '%',))
     rows = sql.fetchall()
 
     return rows
@@ -206,7 +216,7 @@ def auto_vw_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM vw WHERE id=11;')
+    product_id = sql.execute('SELECT * FROM main.vw WHERE id=11;')
     return product_id.fetchall()
 
 
@@ -215,7 +225,7 @@ def motor_vw_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM vw WHERE id=22;')
+    product_id = sql.execute('SELECT * FROM main.vw WHERE id=22;')
     return product_id.fetchall()
 
 
@@ -224,7 +234,7 @@ def vw_accessories_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM vw WHERE id=33;')
+    product_id = sql.execute('SELECT * FROM main.vw WHERE id=33;')
     return product_id.fetchall()
 
 
@@ -233,7 +243,7 @@ def vw_chemical_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM vw WHERE id=44;')
+    product_id = sql.execute('SELECT * FROM main.vw WHERE id=44;')
     return product_id.fetchall()
 
 
@@ -242,7 +252,7 @@ def vw_filter_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM vw WHERE id=55;')
+    product_id = sql.execute('SELECT * FROM main.vw WHERE id=55;')
     return product_id.fetchall()
 
 
@@ -251,7 +261,7 @@ def vw_other_product():
     connection = sqlite3.connect('base.db')
     sql = connection.cursor()
 
-    product_id = sql.execute('SELECT * FROM vw WHERE id=66;')
+    product_id = sql.execute('SELECT * FROM main.vw WHERE id=66;')
     return product_id.fetchall()
 
 

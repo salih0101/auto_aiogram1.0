@@ -61,7 +61,7 @@ def main_menu():
     keyboard.add('SKODA', 'VOLKSWAGEN')
     keyboard.add('📄Список заказов')
     keyboard.add('🛒Корзина')
-    keyboard.add('Контакты☎️', 'О нас')
+    keyboard.add('☎️Контакты', 'О нас')
 
     return keyboard
 
@@ -185,7 +185,7 @@ def product_name_kb(category_id):
 
 def skoda_catalog():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add('АКСЕССУАРЫ')
+    keyboard.add('АКСЕССУАРЫ', 'АВТОХИМИЯ')
     keyboard.add('ХОДОВАЯ ЧАСТЬ', 'МОТОРНАЯ ЧАСТЬ')
     keyboard.add('ФИЛЬТРА', 'ОСТАЛЬНОЕ')
     keyboard.add('🛒Корзина', '🔙Назад')
@@ -196,6 +196,7 @@ def skoda_catalog():
 def vw_catalog():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add('АКСЕССУАРЫ VW')
+    keyboard.add('АВТОХИМИЯ')
     keyboard.add('ХОДОВАЯ ЧАСТЬ VW', 'МОТОРНАЯ ЧАСТЬ VW')
     keyboard.add('ФИЛЬТРА VW', 'ОСТАЛЬНОЕ VW')
     keyboard.add('🛒Корзина', '◀️Назад')
@@ -285,7 +286,7 @@ def choose_product_count(plus_or_minus='', current_amount=1):
     kb = InlineKeyboardMarkup(row_width=3)
 
     # Несгораемые кнопки
-    back = InlineKeyboardButton(text='Назад', callback_data='back')
+    # back = InlineKeyboardButton(text='Назад', callback_data='back')
     plus = InlineKeyboardButton(text='+', callback_data='increment')
     minus = InlineKeyboardButton(text='-', callback_data='decrement')
     count = InlineKeyboardButton(text=str(current_amount),
@@ -310,7 +311,7 @@ def choose_product_count(plus_or_minus='', current_amount=1):
     # Обьеденим кнопки с пространством
     kb.add(minus, count, plus)
     kb.row(add_to_cart)
-    kb.row(back)
+    # kb.row(back)
 
     # Возвращаем кнопки
     return kb
