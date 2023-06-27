@@ -12,7 +12,7 @@ def get_username_kb():
 
 
 def admin_kb():
-    kb = ReplyKeyboardMarkup(resize_keyboard=True)
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=1)
     btn_add = KeyboardButton('Добавить товар')
     btn_client = KeyboardButton('Меню клиента')
     btn_client1 = KeyboardButton('/show_users')
@@ -59,12 +59,20 @@ def product_count():
 def main_menu():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add('SKODA', 'VOLKSWAGEN')
-    keyboard.add('📄Список заказов')
+    keyboard.add('📄Список заказов', '👤Профиль')
     keyboard.add('🛒Корзина')
     keyboard.add('☎️Контакты', 'О нас')
 
     return keyboard
 
+def change_data_kb():
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    ch_name = KeyboardButton('Изменить имя')
+    ch_number = KeyboardButton('Изменить номер')
+    back = KeyboardButton('НАЗАД')
+    kb.add(ch_name, ch_number, back)
+
+    return kb
 
 def accessories_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
@@ -282,11 +290,11 @@ def vw_other_kb():
 
 
 def choose_product_count(plus_or_minus='', current_amount=1):
-    # Создаем пространство для кнопок
+
     kb = InlineKeyboardMarkup(row_width=3)
 
-    # Несгораемые кнопки
-    # back = InlineKeyboardButton(text='Назад', callback_data='back')
+
+    back = InlineKeyboardButton(text='Отправить администратору', url='https://t.me/activebee_tashkent')
     plus = InlineKeyboardButton(text='+', callback_data='increment')
     minus = InlineKeyboardButton(text='-', callback_data='decrement')
     count = InlineKeyboardButton(text=str(current_amount),
@@ -294,7 +302,6 @@ def choose_product_count(plus_or_minus='', current_amount=1):
     add_to_cart = InlineKeyboardButton(text='Добавить в корзину',
                                        callback_data='to_cart')
 
-    # Отслеживаем плюс или минус
     if plus_or_minus == 'increment':
         new_amount = int(current_amount) + 1
 
@@ -308,13 +315,16 @@ def choose_product_count(plus_or_minus='', current_amount=1):
             count = InlineKeyboardButton(text=str(new_amount),
                                          callback_data=str(new_amount))
 
-    # Обьеденим кнопки с пространством
+
     kb.add(minus, count, plus)
     kb.row(add_to_cart)
-    # kb.row(back)
 
-    # Возвращаем кнопки
     return kb
 
 
+def send_admin_kb():
+    kb = InlineKeyboardMarkup(row_width=3)
+    send = InlineKeyboardButton(text='Отправить администратору', url='https://t.me/activebee_tashkent')
 
+    kb.add(send)
+    return kb

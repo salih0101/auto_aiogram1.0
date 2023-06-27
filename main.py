@@ -1,7 +1,7 @@
 import sqlite3
 from aiogram import Dispatcher, executor, Bot, types
 from aiogram.dispatcher import FSMContext
-from states import Registration, GetProduct, Cart, Order
+from states import Registration, GetProduct, Cart, Order, Settings
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv, find_dotenv
 from datetime import datetime, timedelta
@@ -29,7 +29,6 @@ contacts = f'📞 Наш номер телефона:\n +998990952992 и +998990
             f'Администратор: @ms2992\n\n'\
             f'🚚 Мы также предлагаем бесплатную доставку по городу.\n\n'\
             f'Не стесняйтесь обращаться к нам, мы всегда готовы оказать помощь и поддержку в вопросах автозапчастей.'\
-
 
 
 @dp.message_handler(commands=['start'])
@@ -87,33 +86,6 @@ async def show_users(message: types.Message):
     await message.answer(response)
 
 
-# @dp.message_handler(commands=['search'])
-# async def search(message: types.Message):
-#     user_id = message.from_user.id
-#     args = message.get_args()
-#
-#     if not args:
-#         await message.reply('Вы не указали название товара.\n\n'
-#                             'Для поиска товара сперва напишите /search (Название товара)')
-#         return
-#
-#     products = database.search_product(args)
-#
-#     if not products:
-#         await message.reply('Товары не найдены.')
-#
-#     else:
-#
-#         for product in products:
-#             await dp.current_state(user=user_id).update_data(pr_name=product[0], pr_count=1, price=product[2])
-#
-#             await bot.send_photo(user_id,
-#                                  photo=product[4],
-#                                  caption=f'{product[0]}\n\nЦена: {product[2]} $\n\nОписание:\n {product[3]}',
-#                                  reply_markup=btns.choose_product_count())
-#
-#         await states.GetProduct.getting_pr_count.set()
-
 @dp.message_handler(commands=['search'])
 async def search(message: types.Message):
     user_id = message.from_user.id
@@ -133,6 +105,7 @@ async def search(message: types.Message):
         matching_products = []
 
         for product in products:
+
             product_name = product[0].lower()
             search_terms = args.lower().split()
 
@@ -149,29 +122,25 @@ async def search(message: types.Message):
                 await bot.send_photo(user_id,
                                      photo=product[4],
                                      caption=f'{product[0]}\n\nЦена: {product[2]} $\n\nОписание:\n {product[3]}',
-                                     reply_markup=btns.choose_product_count())
-
-            # await states.GetProduct.getting_pr_count.set()
-
+                                     reply_markup=btns.send_admin_kb())
 
 
 async def broadcast_message(message_text):
-    # Подключение к базе данных SQLite3
+
     conn = sqlite3.connect('base.db')
     cursor = conn.cursor()
 
-    # Получаем список пользователей из базы данных
+
     cursor.execute('SELECT id FROM users')
     users = cursor.fetchall()
 
-    # Отправляем сообщение каждому пользователю
     for user in users:
         user_id = user[0]
         await bot.send_message(chat_id=user_id, text=message_text)
 
 @dp.message_handler(commands=['broadcast'])
 async def broadcast_command(message: types.Message):
-    # Получаем текст сообщения после команды /broadcast
+
     command_args = message.text.split(' ', maxsplit=1)
     if len(command_args) == 2:
         message_text = command_args[1]
@@ -179,6 +148,7 @@ async def broadcast_command(message: types.Message):
         await message.reply(f'Сообщение успешно отправлено всем пользователям.')
     else:
         await message.reply('Неверный формат команды. Используйте /broadcast message_text')
+
 
 @dp.message_handler(state=states.Admin.get_status)
 async def get_name(message, state=states.Admin.get_status):
@@ -247,6 +217,7 @@ async def product_info1(message, state=states.Add_product.get_info):
 
 @dp.message_handler(content_types=['photo'], state=states.Add_product.get_photo)
 async def product_photo(message, state=states.Add_product.get_photo):
+
     all_info = await state.get_data()
     name = all_info.get('name')
     prd_id = all_info.get('id')
@@ -317,7 +288,13 @@ async def choose_count(message):
 
     actual_products = [i[0] for i in database.get_name_product(category_id)]
 
-    if user_answerr in actual_products:
+    if user_answerr == 'Назад':
+        await message.answer('Выберите категорию🔽',
+                             reply_markup=btns.skoda_catalog())
+        await dp.current_state(user=user_id).finish()
+
+
+    elif user_answerr in actual_products:
 
         product_info = database.get_all_info_product(user_answerr)
 
@@ -339,10 +316,7 @@ async def choose_count(message):
 
         await states.GetProduct.getting_pr_count.set()
 
-    elif user_answerr == 'Назад':
-        await message.answer('Выберите категорию🔽',
-                             reply_markup=btns.skoda_catalog())
-        await dp.current_state(user=user_id).finish()
+
 
     elif user_answerr == 'Назад VW':
         await message.answer('Выберите категорию🔽',
@@ -367,8 +341,6 @@ async def text_message3(message, state=GetProduct.getting_pr_count):
                              reply_markup=btns.main_menu())
         await state.finish()
 
-    # elif message.text != 'Главное меню':
-    #     await message.answer('Тест', reply_markup=btns.main_menu())
 
     else:
         await message.answer('Нажмите еще раз кнопку Назад🔽',
@@ -420,8 +392,8 @@ async def cart_function(message, state=Cart.waiting_for_product):
         user_cart = database.get_user_cart(message.from_user.id)
 
         if user_cart:
-            result_answer = f'Ваш заказ №{order_id} :\n\n'
-            admin_message = f'Новый заказ №{order_id}:\n\n'
+            result_answer = f'Ваш заказ № {order_id} :\n\n'
+            admin_message = f'Новый заказ № {order_id}:\n\n'
             total_price = 0
 
             for iq in user_cart:
@@ -459,8 +431,8 @@ async def accept_order(message):
         user_cart = database.get_user_cart(message.from_user.id)
 
         if user_cart:
-            result_answer = f'Ваш заказ №{order_id}:\n\n'
-            admin_message = f'Новый заказ №{order_id}:\n\n'
+            result_answer = f'Ваш заказ № {order_id}:\n\n'
+            admin_message = f'Новый заказ № {order_id}:\n\n'
             total_price = 0
 
             for i in user_cart:
@@ -480,6 +452,63 @@ async def accept_order(message):
             await bot.send_message(5928000362, admin_message)
             await dp.current_state(user=message.from_user.id).finish()
             database.delete_from_cart(user_id)
+
+
+
+@dp.message_handler(state=Settings.set_setting, content_types=['text'])
+async def set_name(message):
+    user_answer = message.text
+    user_id = message.from_user.id
+    try:
+        match user_answer:
+            case 'Изменить имя':
+                await message.answer('Отправьте имя')
+                await Settings.set_name.set()
+
+            case 'Изменить номер':
+                await message.answer('Отправьте номер')
+                await Settings.set_number.set()
+
+    except Exception as e:
+        print(e)
+        await message.answer('Неверный ввод')
+
+    try:
+        match user_answer:
+            case 'НАЗАД':
+                await message.answer('Вы вернулись в Главное меню', reply_markup=btns.main_menu())
+                await dp.current_state(user=user_id).reset_state()
+
+    except Exception as e:
+        print(e)
+        await message.answer('Неверный ввод')
+
+
+@dp.message_handler(state=states.Settings.set_name)
+async def change_name_db(message, state=Settings.set_name):
+    user_answer = message.text
+
+    await state.update_data(name=user_answer)
+
+    ch_name = await state.get_data()
+    user_id = message.from_user.id
+    database.change_name(user_id, ch_name)
+    await state.finish()
+    await message.answer('Имя пользователя "Успешно изменен"', reply_markup=btns.main_menu())
+
+
+@dp.message_handler(state=Settings.set_number)
+async def change_number_db(message, state=Settings.set_number):
+    user_answer = message.text
+
+    await state.update_data(phone_number=user_answer)
+
+    ch_number = await state.get_data()
+    user_id = message.from_user.id
+    database.change_number(user_id, ch_number)
+    await state.finish()
+    await message.answer('Номер Успешно изменен', reply_markup=btns.main_menu())
+
 
 
 @dp.message_handler(content_types=['text'])
@@ -509,6 +538,10 @@ async def main_menu(message):
     if user_answer == 'SKODA':
         await message.answer('Выберите категорию🔽',
                              reply_markup=btns.skoda_catalog())
+
+    elif user_answer == '👤Профиль':
+        await message.answer('Выберите что хотите изменить', reply_markup=btns.change_data_kb())
+        await states.Settings.set_setting.set()
 
 
     elif user_answer == '🔙Назад':
@@ -680,11 +713,11 @@ async def get_user_product_count(call):
 
 
 
-    # elif call.data == 'back':
-    #
-    #     await call.message.answer('Выберите пункт меню',
-    #                               reply_markup=btns.skoda_catalog())
-    #     await dp.current_state(user=user_id).finish()
+    elif call.data == 'back':
+
+        await call.message.answer('Выберите пункт меню',
+                                  reply_markup=btns.skoda_catalog())
+        await dp.current_state(user=user_id).finish()
 
 
     elif call.data == 'to_cart':

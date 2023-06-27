@@ -265,6 +265,23 @@ def vw_other_product():
     return product_id.fetchall()
 
 
+def change_name(user_id, name):
+    connection = sqlite3.connect('base.db')
+    sql = connection.cursor()
+
+    sql.execute('UPDATE users SET name=? WHERE id=?;', (name['name'], user_id))
+    connection.commit()
+
+def change_number(user_id, phone_number):
+    connection = sqlite3.connect('base.db')
+    sql = connection.cursor()
+
+    sql.execute('UPDATE users SET phone_number=? WHERE id=?;', (phone_number['phone_number'], user_id))
+    connection.commit()
+
+
+
+
 # Запрос на создание таблицы
 
 # sql.execute('CREATE TABLE users (id INTEGER, name INTEGER, phone_number TEXT, loc_lat REAL, loc_long REAL, gender TEXT);')

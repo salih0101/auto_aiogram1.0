@@ -40,4 +40,12 @@ class Cart(StatesGroup):
     waiting_new_count = State()
 
 
+class Settings(StatesGroup):
+    set_setting = State()
+    set_name_setting = State()
+    set_number_setting = State()
+    set_name = State()
+    set_number = State()
+
+
 
