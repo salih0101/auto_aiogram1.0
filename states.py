@@ -25,6 +25,9 @@ class Add_product(StatesGroup):
 class Search(StatesGroup):
     search_product = State()
 
+class Get_users(StatesGroup):
+    get_all_users = State()
+
 
 class Admin(StatesGroup):
     get_status = State()

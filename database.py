@@ -173,6 +173,15 @@ def accessories_product():
     return product_id.fetchall()
 
 
+def electrics_product():
+
+    connection = sqlite3.connect('base.db')
+    sql = connection.cursor()
+
+    product_id = sql.execute('SELECT * FROM products WHERE products.id=17;')
+    return product_id.fetchall()
+
+
 def chemical_product():
 
     connection = sqlite3.connect('base.db')
@@ -226,6 +235,15 @@ def motor_vw_product():
     sql = connection.cursor()
 
     product_id = sql.execute('SELECT * FROM main.vw WHERE id=22;')
+    return product_id.fetchall()
+
+
+def electrics_vw_product():
+
+    connection = sqlite3.connect('base.db')
+    sql = connection.cursor()
+
+    product_id = sql.execute('SELECT * FROM main.vw WHERE id=77;')
     return product_id.fetchall()
 
 
@@ -285,6 +303,6 @@ def change_number(user_id, phone_number):
 # Запрос на создание таблицы
 
 # sql.execute('CREATE TABLE users (id INTEGER, name INTEGER, phone_number TEXT, loc_lat REAL, loc_long REAL, gender TEXT);')
-# sql.execute('CREATE TABLE vw (name INTEGER, id INTEGER, price INTEGER, description TEXT, picture TEXT, notes TEXT);')
+# sql.execute('CREATE TABLE products1 (name INTEGER, id INTEGER, price INTEGER, description TEXT, picture TEXT, notes TEXT);')
 # sql.execute('CREATE TABLE cart (user_id INTEGER, product_name TEXT, user_number TEXT, product_price INTEGER, product_count INTEGER);')
 

@@ -1,7 +1,7 @@
 import sqlite3
 from aiogram import Dispatcher, executor, Bot, types
 from aiogram.dispatcher import FSMContext
-from states import Registration, GetProduct, Cart, Order, Settings
+from states import Registration, GetProduct, Cart, Order, Settings, Search
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from dotenv import load_dotenv, find_dotenv
 from datetime import datetime, timedelta
@@ -19,6 +19,10 @@ bot = Bot(os.getenv('TOKEN'))
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 
+delivery = f'Обратите внимание\n\n' \
+           f''
+
+
 about = f'Мы - ваш надежный союзник в мире автозапчастей.\n' \
         f'Огромный ассортимент, цены, от которых задыхается конкуренция, и безупречное качество - вот наши основные козыри.\n' \
         f'Доверьте нам заботу о вашем автомобиле, и он будет всегда в идеальном состоянии.\n'\
@@ -31,10 +35,10 @@ contacts = f'📞 Наш номер телефона:\n +998990952992 и +998990
             f'Не стесняйтесь обращаться к нам, мы всегда готовы оказать помощь и поддержку в вопросах автозапчастей.'\
 
 
-@dp.message_handler(commands=['start'])
+@dp.message_handler(commands=['start'], state='*')
 async def start_message(message):
-    start_txt = f'{message.from_user.first_name}\nПриветствуем в боте'
-    start_reg = f'Для начала пройдите простую регистрацию, чтобы в дальнейшем не было проблем с доставкой\n\nВведите Ваше имя или выберите поделиться👇:'
+    start_txt = f'{message.from_user.first_name}\nДобро пожаловать в бот SKODA VW PartsXpress!'
+    start_reg = f'Для начала пройдите простую регистрацию, чтобы в дальнейшем не было проблем с доставкой\n\nВведите Ваше имя:'
 
     user_id = message.from_user.id
     checker = database.check_user(user_id)
@@ -45,7 +49,7 @@ async def start_message(message):
         await states.Admin.get_status.set()
 
     elif checker:
-        await message.answer('Приветствую в боте SKODA VW PartsXpress.\n\n Выберите категорию',
+        await message.answer('\nДобро пожаловать в бот SKODA VW PartsXpress!\n\nЧтобы начать, выберите категорию, которая вас интересует.',
                              reply_markup=btns.main_menu())
 
     else:
@@ -58,7 +62,7 @@ async def start_message(message):
 
 @dp.message_handler(commands=['show_users'])
 async def show_users(message: types.Message):
-    admin_id = 1186132006
+    admin_id = 5928000362
 
     if message.from_user.id != admin_id:
         response = "Команда доступна только администратору."
@@ -74,7 +78,7 @@ async def show_users(message: types.Message):
             writer.writerow(["ID", "Username"])
 
             for user in users:
-                writer.writerow([user[0], user[1]])
+                writer.writerow([user[0], user[1], user[2]])
 
         with open('users.csv', 'rb') as file:
             await message.bot.send_document(admin_id, file)
@@ -86,34 +90,36 @@ async def show_users(message: types.Message):
     await message.answer(response)
 
 
-@dp.message_handler(commands=['search'])
-async def search(message: types.Message):
+@dp.message_handler(state=Search.search_product, content_types=['text'])
+async def search(message):
     user_id = message.from_user.id
-    args = message.get_args()
+    text = message.text.strip()
 
-    if not args:
+    if not text:
         await message.reply('Вы не указали название товара.\n\n'
                             'Для поиска товара сперва напишите /search (Название товара)')
         return
 
-    products = database.search_product(args)
+    products = database.search_product(text)
 
     if not products:
-        await message.reply('Товары не найдены.')
+        await message.reply('Товары не найдены.', reply_markup=btns.main_menu())
 
     else:
         matching_products = []
 
         for product in products:
 
-            product_name = product[0].lower()
-            search_terms = args.lower().split()
+            product_name = product[0].lower() + product[0]
+            search_terms = text.lower().split()  # Приводим поисковый запрос к нижнему регистру
 
             if all(term in product_name for term in search_terms):
                 matching_products.append(product)
 
         if not matching_products:
-            await message.reply('Товары не найдены.')
+            await message.reply('Товары не найдены.', reply_markup=btns.main_menu())
+
+            return
 
         else:
             for product in matching_products:
@@ -123,6 +129,7 @@ async def search(message: types.Message):
                                      photo=product[4],
                                      caption=f'{product[0]}\n\nЦена: {product[2]} $\n\nОписание:\n {product[3]}',
                                      reply_markup=btns.send_admin_kb())
+
 
 
 async def broadcast_message(message_text):
@@ -331,7 +338,7 @@ async def text_message3(message, state=GetProduct.getting_pr_count):
     user_product = user_data.get('user_product')
     category_id = user_data.get('category_id')
     pr_price = float(user_data.get('price'))
-    user_id = message.from_user.id
+
 
     if product_count.isnumeric():
         database.add_pr_to_cart(message.from_user.id, user_product, pr_price, int(product_count))
@@ -396,13 +403,13 @@ async def cart_function(message, state=Cart.waiting_for_product):
             admin_message = f'Новый заказ № {order_id}:\n\n'
             total_price = 0
 
-            for iq in user_cart:
-                result_answer += f'- {iq[1]}: {iq[-1]} шт = {iq[3]:.2f}$\n'
-                admin_message += f'- {iq[1]}: {iq[-1]} шт = {iq[3]:.2f}$\n\n'
-                total_price += iq[3]
+            for i in user_cart:
+                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n'
+                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n\n'
+                total_price += i[3]
 
             result_answer += f' \nИтог: {total_price:.2f}$\n\n'
-            admin_message += f' Номер телефона: {iq[2]}\n\nИтог: {total_price:.2f}$\n\n'
+            admin_message += f' Номер телефона: {i[2]}\n\nИтог: {total_price:.2f}$\n\n'
 
             delivery_date = datetime.now() + timedelta(days=14)
             result_answer += f'Дата доставки: {delivery_date.strftime("%d.%m.%Y")}'
@@ -539,6 +546,12 @@ async def main_menu(message):
         await message.answer('Выберите категорию🔽',
                              reply_markup=btns.skoda_catalog())
 
+
+    elif user_answer == '🔍Поиск':
+        await message.answer('Отправьте название товара', reply_markup=btns.ReplyKeyboardRemove())
+        await states.Search.search_product.set()
+
+
     elif user_answer == '👤Профиль':
         await message.answer('Выберите что хотите изменить', reply_markup=btns.change_data_kb())
         await states.Settings.set_setting.set()
@@ -554,6 +567,13 @@ async def main_menu(message):
         await dp.current_state(user=user_id).update_data(category_id=15)
         await message.answer('Выберите продукт🔽',
                              reply_markup=btns.auto_skoda_kb())
+        await states.GetProduct.getting_pr_name.set()
+
+
+    elif user_answer == 'ЭЛЕКТРИКА':
+        await dp.current_state(user=user_id).update_data(category_id=17)
+        await message.answer('Выберите продукт🔽',
+                             reply_markup=btns.electrics_kb())
         await states.GetProduct.getting_pr_name.set()
 
 
@@ -594,6 +614,13 @@ async def main_menu(message):
     if user_answer == 'VOLKSWAGEN':
         await message.answer('Выберите категорию🔽',
                              reply_markup=btns.vw_catalog())
+
+
+    elif user_answer == 'ЭЛЕКТРИКА VW':
+        await dp.current_state(user=user_id).update_data(category_id=77)
+        await message.answer('Выберите продукт🔽',
+                             reply_markup=btns.electrics_kb())
+        await states.GetProduct.getting_pr_name.set()
 
 
     elif user_answer == 'АКСЕССУАРЫ VW':

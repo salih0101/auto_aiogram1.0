@@ -58,9 +58,10 @@ def product_count():
 
 def main_menu():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
-    keyboard.add('SKODA', 'VOLKSWAGEN')
+    keyboard.add('SKODA')
+    keyboard.add('VOLKSWAGEN')
     keyboard.add('📄Список заказов', '👤Профиль')
-    keyboard.add('🛒Корзина')
+    keyboard.add('🔍Поиск', '🛒Корзина')
     keyboard.add('☎️Контакты', 'О нас')
 
     return keyboard
@@ -78,6 +79,17 @@ def accessories_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     button = KeyboardButton('Назад')
     all_products = database.accessories_product()
+
+    buttons = [KeyboardButton(i[0]) for i in all_products]
+    kb.add(*buttons, button)
+
+    return kb
+
+
+def electrics_kb():
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    button = KeyboardButton('Назад')
+    all_products = database.electrics_product()
 
     buttons = [KeyboardButton(i[0]) for i in all_products]
     kb.add(*buttons, button)
@@ -194,6 +206,7 @@ def product_name_kb(category_id):
 def skoda_catalog():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add('АКСЕССУАРЫ', 'АВТОХИМИЯ')
+    keyboard.add('ЭЛЕКТРИКА')
     keyboard.add('ХОДОВАЯ ЧАСТЬ', 'МОТОРНАЯ ЧАСТЬ')
     keyboard.add('ФИЛЬТРА', 'ОСТАЛЬНОЕ')
     keyboard.add('🛒Корзина', '🔙Назад')
@@ -204,7 +217,7 @@ def skoda_catalog():
 def vw_catalog():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add('АКСЕССУАРЫ VW')
-    keyboard.add('АВТОХИМИЯ')
+    keyboard.add('АВТОХИМИЯ VW', 'ЭЛЕКТРИКА VW')
     keyboard.add('ХОДОВАЯ ЧАСТЬ VW', 'МОТОРНАЯ ЧАСТЬ VW')
     keyboard.add('ФИЛЬТРА VW', 'ОСТАЛЬНОЕ VW')
     keyboard.add('🛒Корзина', '◀️Назад')
@@ -214,10 +227,9 @@ def vw_catalog():
 
 def search_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True)
-    search = KeyboardButton('Поиск')
-    back = KeyboardButton('Назад⬅️')
+    back = KeyboardButton('🏠Главное меню')
 
-    kb.add(search, back)
+    kb.add(back)
 
     return kb
 
@@ -270,6 +282,17 @@ def vw_filter_kb():
     kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
     button = KeyboardButton('Назад VW')
     all_products = database.vw_filter_product()
+
+    buttons = [KeyboardButton(i[0]) for i in all_products]
+    kb.add(*buttons, button)
+
+    return kb
+
+
+def vw_electrics_kb():
+    kb = ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
+    button = KeyboardButton('Назад')
+    all_products = database.electrics_product()
 
     buttons = [KeyboardButton(i[0]) for i in all_products]
     kb.add(*buttons, button)
