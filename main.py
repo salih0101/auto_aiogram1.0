@@ -63,7 +63,7 @@ async def show_users(message: types.Message):
 
         with open('users.csv', 'w', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Username"])
+            writer.writerow(["ID", "Username", "Phone_number"])
 
             for user in users:
                 writer.writerow([user[0], user[1], user[2]])
@@ -119,7 +119,6 @@ async def search(message):
                                      reply_markup=btns.send_admin_kb())
 
 
-
 async def broadcast_message(message_text):
 
     conn = sqlite3.connect('base.db')
@@ -132,6 +131,7 @@ async def broadcast_message(message_text):
     for user in users:
         user_id = user[0]
         await bot.send_message(chat_id=user_id, text=message_text)
+
 
 @dp.message_handler(commands=['broadcast'])
 async def broadcast_command(message: types.Message):
@@ -220,7 +220,7 @@ async def product_photo(message, state=states.Add_product.get_photo):
     description = all_info.get('description')
     photo_id = all_info.get('picture')
     nt = all_info.get('notes')
-    picture = message.photo[-2].file_id
+    picture = message.photo[-1].file_id
     await state.update_data(photo=photo_id)
 
     database.add_products_to_db(name, prd_id, price, description, picture, nt)
