@@ -49,6 +49,3 @@ class Settings(StatesGroup):
     set_number_setting = State()
     set_name = State()
     set_number = State()
-
-
-

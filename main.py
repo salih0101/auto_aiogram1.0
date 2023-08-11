@@ -303,7 +303,7 @@ async def choose_count(message):
                                      f'Цена: {product_info[2]} $\n\n'
                                      f'Описание:\n {product_info[3]}\n\n'
                                      f'@VW_Skoda_Bot',
-                             reply_markup=btns.product_count())
+                             replgy_markup=btns.product_count())
         await message.answer('Выберите количество1️⃣2️⃣3️⃣')
 
         await dp.current_state(user=user_id).update_data(user_product=message.text,
