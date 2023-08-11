@@ -454,29 +454,20 @@ async def accept_order(message):
 async def set_name(message):
     user_answer = message.text
     user_id = message.from_user.id
-    try:
-        match user_answer:
-            case 'Изменить имя':
-                await message.answer('Отправьте имя')
-                await Settings.set_name.set()
+    if user_answer == 'Изменит имя':
+        await message.answer("Отправьте имя!")
+        await Settings.set_name.set()
 
-            case 'Изменить номер':
-                await message.answer('Отправьте номер')
-                await Settings.set_number.set()
+    elif user_answer == 'Изменит номер':
+        await message.answer("Отправьте номер телефона")
+        await Settings.set_number.set()
 
-    except Exception as e:
-        print(e)
-        await message.answer('Неверный ввод')
 
-    try:
-        match user_answer:
-            case 'НАЗАД':
-                await message.answer('Вы вернулись в Главное меню', reply_markup=btns.main_menu())
-                await dp.current_state(user=user_id).reset_state()
 
-    except Exception as e:
-        print(e)
-        await message.answer('Неверный ввод')
+    elif user_answer == 'НАЗАД':
+        await message.answer('Вы вернулись в Главное меню', reply_markup=btns.main_menu())
+        await dp.current_state(user=user_id).reset_state()
+
 
 
 @dp.message_handler(state=states.Settings.set_name)
