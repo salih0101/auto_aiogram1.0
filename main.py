@@ -115,7 +115,7 @@ async def search(message):
 
                 await bot.send_photo(user_id,
                                      photo=product[4],
-                                     caption=f'{product[0]}\n\nЦена: {product[2]} $\n\nОписание:\n {product[3]}',
+                                     caption=f'{product[0]}\n\nЦена: {product[2]} €\n\nОписание:\n {product[3]}',
                                      reply_markup=btns.send_admin_kb())
 
 
@@ -300,7 +300,7 @@ async def choose_count(message):
 
         await bot.send_photo(user_id, photo=product_info[4],
                              caption=f'{product_info[0]}\n\n'
-                                     f'Цена: {product_info[2]} $\n\n'
+                                     f'Цена: {product_info[2]} €\n\n'
                                      f'Описание:\n {product_info[3]}\n\n'
                                      f'@VW_Skoda_Bot',
                              reply_markup=btns.product_count())
@@ -372,11 +372,11 @@ async def cart_function(message, state=Cart.waiting_for_product):
             total_price = 0
 
             for i in user_cart:
-                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n'
-                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n'
+                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n'
+                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n'
                 total_price += i[3]
 
-            result_answer += f' \nИтог: {total_price:.2f}$'
+            result_answer += f' \nИтог: {total_price:.2f}€'
         await message.answer('Раздел оформления заказа🔽',
                              reply_markup=btns.confirmation_kb())
 
@@ -392,12 +392,12 @@ async def cart_function(message, state=Cart.waiting_for_product):
             total_price = 0
 
             for i in user_cart:
-                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n'
-                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n\n'
+                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n'
+                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n\n'
                 total_price += i[3]
 
-            result_answer += f' \nИтог: {total_price:.2f}$\n\n'
-            admin_message += f' Номер телефона: {i[2]}\n\nИтог: {total_price:.2f}$\n\n'
+            result_answer += f' \nИтог: {total_price:.2f}€\n\n'
+            admin_message += f' Номер телефона: {i[2]}\n\nИтог: {total_price:.2f}€\n\n'
 
             delivery_date = datetime.now() + timedelta(days=14)
             result_answer += f'Дата доставки: {delivery_date.strftime("%d.%m.%Y")}'
@@ -431,12 +431,12 @@ async def accept_order(message):
             total_price = 0
 
             for i in user_cart:
-                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n\n'
-                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n\n'
+                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n\n'
+                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n\n'
                 total_price += i[3]
 
-            result_answer += f'\nИтог: {total_price:.2f}$\n\n'
-            admin_message += f'Номер телефона: {i[2]}\n\nИтог: {total_price:.2f}$\n\n'
+            result_answer += f'\nИтог: {total_price:.2f}€\n\n'
+            admin_message += f'Номер телефона: {i[2]}\n\nИтог: {total_price:.2f}€\n\n'
 
             delivery_date = datetime.now() + timedelta(days=14)
             result_answer += f'Дата доставки: {delivery_date.strftime("%d.%m.%Y")}'
@@ -510,10 +510,10 @@ async def main_menu(message):
             total_price = 0
 
             for i in user_cart:
-                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n\n'
+                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n\n'
                 total_price += i[3]
 
-            result_answer += f' \nИтог: {total_price:.2f}$'
+            result_answer += f' \nИтог: {total_price:.2f}€'
 
             await message.answer(result_answer, reply_markup=btns.cart_kb())
             await Cart.waiting_for_product.set()
@@ -667,12 +667,12 @@ async def main_menu(message):
             total_price = 0
 
             for i in user_cart:
-                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n\n'
-                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}$\n\n'
+                result_answer += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n\n'
+                admin_message += f'- {i[1]}: {i[-1]} шт = {i[3]:.2f}€\n\n'
                 total_price += i[3]
 
-            result_answer += f' \nИтог: {total_price:.2f}$'
-            admin_message += f' Номер телефона: {i[2]}\n\nИтог: {total_price:.2f}$'
+            result_answer += f' \nИтог: {total_price:.2f}€'
+            admin_message += f' Номер телефона: {i[2]}\n\nИтог: {total_price:.2f}€'
 
             await message.answer(result_answer,
                                  reply_markup=btns.order_kb())
