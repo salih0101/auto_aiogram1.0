@@ -61,7 +61,7 @@ def main_menu():
     keyboard.add('SKODA')
     keyboard.add('VOLKSWAGEN')
     keyboard.add('📄Список заказов', '👤Профиль')
-    keyboard.add('🔍Поиск', '🛒Корзина')
+    keyboard.add('🛒Корзина')
     keyboard.add('☎️Контакты', 'О нас')
 
     return keyboard
