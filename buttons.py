@@ -217,7 +217,7 @@ def skoda_catalog():
 def vw_catalog():
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
     keyboard.add('АКСЕССУАРЫ VW')
-    keyboard.add('АВТОХИМИЯ VW', 'ЭЛЕКТРИКА VW')
+    keyboard.add('АВТОХИМИЯ V', 'ЭЛЕКТРИКА VW')
     keyboard.add('ХОДОВАЯ ЧАСТЬ VW', 'МОТОРНАЯ ЧАСТЬ VW')
     keyboard.add('ФИЛЬТРА VW', 'ОСТАЛЬНОЕ VW')
     keyboard.add('🛒Корзина', '◀️Назад')
